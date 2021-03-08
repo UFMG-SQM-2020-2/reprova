@@ -1,0 +1,43 @@
+# This workflow will build a Java project with Maven
+# For more information see: https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-maven
+
+name: Java CI with Maven
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  unittest:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up JDK 1.11
+      uses: actions/setup-java@v1
+      with:
+        java-version: 1.11
+    - name: Build with Maven
+      run: mvn -B package --file pom.xml
+    - name: Run unit tests
+      run: mvn -B test --file pom.xml
+  coverage:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up JDK 1.11
+        uses: actions/setup-java@v1
+        with:
+          java-version: 1.11
+      - run: mvn -B clean test jacoco:report --file pom.xml
+      - name: Codecov
+        # You may pin to the exact commit or the version.
+        # uses: codecov/codecov-action@1fc7722ded4708880a5aea49f2bfafb9336f0c8d
+        uses: codecov/codecov-action@v1.1.1
+        with:
+          # User defined upload name. Visible in Codecov UI
+          name: Reprova
+          file: ./target/site/jacoco/jacoco.xml
+          # Specify whether or not CI build should fail if Codecov runs into an error during upload
+          fail_ci_if_error: true
+          # Specify whether the Codecov output should be verbose
+          verbose: true
