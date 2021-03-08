@@ -36,6 +36,15 @@ class QuestionsControllerTest {
         .content(json)).andExpect(status().is2xxSuccessful()).andReturn();
         assertEquals(result.getResponse().getStatus(), status().is2xxSuccessful());
     }
+    
+    @Test
+    void testSingleQuestionCreationEmptyForm() throws Exception {
+        var result = this.mockMvc.perform(post("/questions")
+        .contentType(MediaType.APPLICATION_JSON)
+        .content("")).andReturn();
+        assertEquals(result.getResponse().getStatus(), status().is4xxClientError());
+    }
+    
     @Test
     void testGetAllQuestions() throws Exception {
         var json = "{\"description\":\"Description\",\"statement\":\"Statement\",\"discipline\":\"Discipline\",\"themes\":[\"theme1\", \"theme2\"],\"tags\":[\"tag1\", \"tag2\"],\"pvt\":true,\"estimateTimeInMinutes\":3,\"difficulty\":\"EASY\",\"filePath\":\"File/Path\"}";
@@ -52,6 +61,7 @@ class QuestionsControllerTest {
         var result = this.mockMvc.perform(get("/questions")).andExpect(MockMvcResultMatchers.content().json("["+json+"]")).andReturn();
         assertEquals(result.getResponse().getStatus(), status().is2xxSuccessful());
     }
+    
     @Test
     void testFindQuestionById() throws Exception {
         var json = "{\"description\":\"Description\",\"statement\":\"Statement\",\"discipline\":\"Discipline\",\"themes\":[\"theme1\", \"theme2\"],\"tags\":[\"tag1\", \"tag2\"],\"pvt\":true,\"estimateTimeInMinutes\":3,\"difficulty\":\"EASY\",\"filePath\":\"File/Path\"}";
@@ -64,6 +74,7 @@ class QuestionsControllerTest {
         var result = this.mockMvc.perform(get("/questions/" + jsonObject.getString("id"))).andExpect(MockMvcResultMatchers.content().json("["+json+"]")).andReturn();
         assertEquals(result.getResponse().getStatus(), status().is2xxSuccessful());
     }
+    
     @Test
     void testFindQuestionWrongId() throws Exception {
         var json = "{\"description\":\"Description\",\"statement\":\"Statement\",\"discipline\":\"Discipline\",\"themes\":[\"theme1\", \"theme2\"],\"tags\":[\"tag1\", \"tag2\"],\"pvt\":true,\"estimateTimeInMinutes\":3,\"difficulty\":\"EASY\",\"filePath\":\"File/Path\"}";
@@ -75,6 +86,7 @@ class QuestionsControllerTest {
         var result = this.mockMvc.perform(get("/questions/-1")).andExpect(MockMvcResultMatchers.content().json("["+json+"]")).andReturn();
         assertEquals(result.getResponse().getStatus(), status().is4xxClientError());
     }
+    
     @Test
     void testAddGradesToQuestion() throws Exception {
         var json = "{\"description\":\"Description\",\"statement\":\"Statement\",\"discipline\":\"Discipline\",\"themes\":[\"theme1\", \"theme2\"],\"tags\":[\"tag1\", \"tag2\"],\"pvt\":true,\"estimateTimeInMinutes\":3,\"difficulty\":\"EASY\",\"filePath\":\"File/Path\"}";
@@ -90,6 +102,20 @@ class QuestionsControllerTest {
         assertEquals(result.getResponse().getStatus(), status().is2xxSuccessful());
     }
     
+    @Test
+    void testAddGradesToWrongQuestion() throws Exception {
+        var json = "{\"description\":\"Description\",\"statement\":\"Statement\",\"discipline\":\"Discipline\",\"themes\":[\"theme1\", \"theme2\"],\"tags\":[\"tag1\", \"tag2\"],\"pvt\":true,\"estimateTimeInMinutes\":3,\"difficulty\":\"EASY\",\"filePath\":\"File/Path\"}";
+        var grades = "{\"year\": 2020,\"semester\": 2,\"discipline\": \"Software Reuse\",\"grades\": {\"student\": \"1\", \"grade\": 7},{\"student\": \"2\", \"grade\": 5.8},{\"student\": \"3\", \"grade\": 2},{\"student\": \"4\", \"grade\": 7},{\"student\": \"5\", \"grade\": 4.5},{\"student\": \"6\", \"grade\": 2},{\"student\": \"7\", \"grade\": 8},{\"student\": \"8\", \"grade\": 9.5}]}";
+        this.mockMvc.perform(post("/questions")
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(json)).andExpect(status().is2xxSuccessful());
+        
+        var result = this.mockMvc.perform(put("/questions/-1/grades")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(grades)).andExpect(status().is2xxSuccessful()).andReturn();      
+        assertEquals(result.getResponse().getStatus(), status().is4xxClientError());
+    }
+    
     //Exams tests
     @Test
     void testCreateRandomExam() throws Exception {
@@ -98,6 +124,14 @@ class QuestionsControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(json)).andExpect(status().is2xxSuccessful()).andReturn();
         assertEquals(result.getResponse().getStatus(), status().is2xxSuccessful());
+    }
+    
+    @Test
+    void testCreateRandomExamEmptyForm() throws Exception {
+        var result = this.mockMvc.perform(post("/exams/generator")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("")).andExpect(status().is2xxSuccessful()).andReturn();
+        assertEquals(result.getResponse().getStatus(), status().is4xxClientError());
     }
     
     @Test
